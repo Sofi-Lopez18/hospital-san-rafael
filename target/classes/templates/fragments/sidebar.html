@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+  <!-- ================================================================
+     SIDEBAR ADMINISTRADOR / DIRECTOR  (acceso total)
+     ================================================================ -->
+  <div th:fragment="sidebar(activePage)"
+    th:if="${usuarioActual != null and (usuarioActual.rol == 'ADMINISTRADOR' or usuarioActual.rol == 'DIRECTOR')}">
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <img th:src="@{/img/logo-hospital.png}" alt="Logo" class="sidebar-logo-img" />
+        <div class="sidebar-brand-text">
+          <h2>Hospital Universitario</h2>
+          <span>San Rafael de Tunja</span>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <a th:href="@{/dashboard}" class="nav-item" th:classappend="${activePage=='dashboard'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+            </svg></span>
+          Dashboard
+        </a>
+        <a th:href="@{/presencia}" class="nav-item" th:classappend="${activePage=='presencia'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg></span>
+          Panel de Presencia
+        </a>
+        <div class="nav-label">Gestión</div>
+        <a th:href="@{/estudiantes}" class="nav-item" th:classappend="${activePage=='estudiantes'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg></span>
+          Estudiantes
+        </a>
+        <a th:href="@{/usuarios}" class="nav-item" th:classappend="${activePage=='usuarios'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg></span>
+          Usuarios
+        </a>
+        <a th:href="@{/areas}" class="nav-item" th:classappend="${activePage=='areas'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18M9 21V9" />
+            </svg></span>
+          Áreas
+        </a>
+        <a th:href="@{/universidades}" class="nav-item" th:classappend="${activePage=='universidades'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg></span>
+          Universidades
+        </a>
+        <div class="nav-label">Planificación</div>
+        <a th:href="@{/horarios}" class="nav-item" th:classappend="${activePage=='horarios'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span>
+          Horarios
+        </a>
+        <a th:href="@{/cronograma}" class="nav-item" th:classappend="${activePage=='cronograma'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span>
+          Cronograma
+        </a>
+        <div class="nav-label">Análisis</div>
+        <a th:href="@{/reportes}" class="nav-item" th:classappend="${activePage=='reportes'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg></span>
+          Reportes
+        </a>
+      </div>
+      <div th:replace="~{fragments/sidebar :: _footer}"></div>
+    </nav>
+    <div th:replace="~{fragments/sidebar :: _modalLogout}"></div>
+  </div>
+
+  <!-- ================================================================
+     SIDEBAR MÉDICO / DOCENTE  (planificación + presencia + reportes)
+     ================================================================ -->
+  <div th:fragment="sidebar(activePage)"
+    th:if="${usuarioActual != null and (usuarioActual.rol == 'MEDICO' or usuarioActual.rol == 'DOCENTE')}">
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <img th:src="@{/img/logo-hospital.png}" alt="Logo" class="sidebar-logo-img" />
+        <div class="sidebar-brand-text">
+          <h2>Hospital Universitario</h2>
+          <span>San Rafael de Tunja</span>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <a th:href="@{/presencia}" class="nav-item" th:classappend="${activePage=='presencia'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg></span>
+          Panel de Presencia
+        </a>
+        <div class="nav-label">Planificación</div>
+        <a th:href="@{/horarios}" class="nav-item" th:classappend="${activePage=='horarios'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span>
+          Horarios
+        </a>
+        <a th:href="@{/cronograma}" class="nav-item" th:classappend="${activePage=='cronograma'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span>
+          Cronograma
+        </a>
+        <div class="nav-label">Análisis</div>
+        <a th:href="@{/reportes}" class="nav-item" th:classappend="${activePage=='reportes'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg></span>
+          Reportes
+        </a>
+      </div>
+      <div th:replace="~{fragments/sidebar :: _footer}"></div>
+    </nav>
+    <div th:replace="~{fragments/sidebar :: _modalLogout}"></div>
+  </div>
+
+  <!-- ================================================================
+     SIDEBAR ESTUDIANTE  (presencia propia + mi horario + perfil)
+     ================================================================ -->
+  <div th:fragment="sidebar(activePage)" th:if="${usuarioActual != null and usuarioActual.rol == 'ESTUDIANTE'}">
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <img th:src="@{/img/logo-hospital.png}" alt="Logo" class="sidebar-logo-img" />
+        <div class="sidebar-brand-text">
+          <h2>Hospital Universitario</h2>
+          <span>San Rafael de Tunja</span>
+        </div>
+      </div>
+      <div class="sidebar-nav">
+        <a th:href="@{/estudiante/presencia}" class="nav-item"
+          th:classappend="${activePage=='est-presencia'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4" />
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+            </svg></span>
+          Mi Asistencia
+        </a>
+        <a th:href="@{/estudiante/mi-horario}" class="nav-item"
+          th:classappend="${activePage=='est-horario'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg></span>
+          Mi Horario
+        </a>
+        <a th:href="@{/estudiante/perfil}" class="nav-item" th:classappend="${activePage=='est-perfil'}?' active':''">
+          <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg></span>
+          Mi Perfil
+        </a>
+      </div>
+      <div th:replace="~{fragments/sidebar :: _footer}"></div>
+    </nav>
+    <div th:replace="~{fragments/sidebar :: _modalLogout}"></div>
+  </div>
+
+  <!-- ================================================================
+     FRAGMENTOS COMPARTIDOS
+     ================================================================ -->
+  <div th:fragment="_footer">
+    <div class="sidebar-footer">
+      <div class="user-card" th:if="${usuarioActual != null}">
+        <div class="user-avatar" th:text="${#strings.substring(usuarioActual.nombre,0,1)}">A</div>
+        <div class="user-info">
+          <div class="name" th:text="${usuarioActual.nombre}">Admin</div>
+          <div class="role" th:text="${usuarioActual.rol}">Rol</div>
+        </div>
+      </div>
+      <button type="button" class="logout-btn" onclick="document.getElementById('modalLogout').classList.add('open')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <div th:fragment="_modalLogout">
+    <div class="modal-overlay" id="modalLogout" style="z-index:9999;">
+      <div class="modal" style="max-width:400px;">
+        <div class="modal-header">
+          <span class="modal-title">Cerrar Sesión</span>
+          <button class="modal-close" onclick="document.getElementById('modalLogout').classList.remove('open')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body" style="padding:24px;text-align:center;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          <p style="font-size:15px;font-weight:600;color:#1e293b;margin:12px 0 6px;">¿Está seguro que desea cerrar
+            sesión?</p>
+          <p style="font-size:13px;color:#94a3b8;">Será redirigido al inicio de sesión.</p>
+        </div>
+        <div class="modal-footer" style="justify-content:center;gap:12px;">
+          <button type="button" class="btn btn-outline"
+            onclick="document.getElementById('modalLogout').classList.remove('open')">Cancelar</button>
+          <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-primary"
+              style="background:linear-gradient(135deg,#ef4444,#dc2626);border-color:#dc2626;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              Sí, cerrar sesión
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <header th:fragment="topbar">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img th:src="@{/img/logo-hospital.png}" alt="Logo" class="topbar-logo" />
+          <div>
+            <h1>Hospital Universitario San Rafael</h1>
+            <p>Sistema de Gestión Hospitalaria · Tunja, Boyacá</p>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right" th:if="${usuarioActual != null}">
+        <div class="user-pill">
+          <div class="avatar" th:text="${#strings.substring(usuarioActual.nombre,0,1)}">A</div>
+          <div class="info">
+            <div class="name" th:text="${usuarioActual.nombre}">Admin</div>
+            <div class="role" th:text="${usuarioActual.rol}">Rol</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+</body>
+
+</html>

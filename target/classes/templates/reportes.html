@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reportes — Hospital San Rafael</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+  <style>
+    /* ── PRINT STYLES ─────────────────────────────── */
+    @media print {
+      /* Ocultar todo lo que no es contenido del reporte */
+      .sidebar, .topbar, .page-header .btn, .report-filters, .print-hide { display:none !important; }
+
+      body, .main-wrap, .page-content { display:block !important; overflow:visible !important; height:auto !important; background:#fff !important; }
+      .main-wrap { margin:0; padding:0; }
+      .page-content { padding:0; }
+
+      /* Cabecera del documento impreso */
+      .print-header { display:flex !important; }
+
+      /* Tarjetas y tablas limpias */
+      .card { box-shadow:none !important; border:1px solid #e2e8f0 !important; break-inside:avoid; margin-bottom:16px; }
+      .report-stat-card { border:1px solid #e2e8f0 !important; box-shadow:none !important; }
+      .two-col { display:block !important; }
+      .two-col .card { width:100% !important; }
+      table { width:100%; border-collapse:collapse; font-size:11px; }
+      th, td { border:1px solid #cbd5e1; padding:6px 8px; }
+      thead { background:#f1f5f9 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .badge { border:1px solid #cbd5e1 !important; background:#f8fafc !important; color:#334155 !important; }
+      a { text-decoration:none; color:inherit; }
+      .page-title { font-size:18px; font-weight:700; }
+    }
+    /* Cabecera solo visible al imprimir */
+    .print-header {
+      display:none;
+      align-items:center;
+      gap:16px;
+      border-bottom:2px solid #0d9488;
+      padding-bottom:12px;
+      margin-bottom:20px;
+    }
+    .print-header-logo { width:60px; }
+    .print-header-info h2 { font-size:16px; font-weight:700; color:#0f766e; margin:0; }
+    .print-header-info p  { font-size:11px; color:#64748b; margin:0; }
+    .print-date { margin-left:auto; font-size:11px; color:#94a3b8; }
+  </style>
+</head>
+<body class="app-layout">
+<div th:replace="~{fragments/sidebar :: sidebar('reportes')}"></div>
+<div class="main-wrap">
+  <div th:replace="~{fragments/sidebar :: topbar}"></div>
+  <main class="page-content">
+
+    <!-- Cabecera visible solo en impresión -->
+    <div class="print-header">
+      <img th:src="@{/img/logo-hospital.png}" class="print-header-logo" alt="Logo"/>
+      <div class="print-header-info">
+        <h2>Hospital Universitario San Rafael de Tunja</h2>
+        <p>Reporte de Horas por Estudiante y Área — Sistema de Gestión Hospitalaria</p>
+      </div>
+      <div class="print-date" id="printDate"></div>
+    </div>
+
+    <!-- Encabezado de página -->
+    <div class="page-header print-hide">
+      <div>
+        <div class="page-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+          Reportes y Estadísticas
+        </div>
+        <div class="page-subtitle">Horas por estudiante y área</div>
+      </div>
+      <button class="btn btn-primary" onclick="imprimirReporte()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir / Exportar PDF
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card report-filters" style="margin-bottom:20px;">
+      <div class="card-body" style="padding:16px 22px;">
+        <form method="get" th:action="@{/reportes}" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+          <div>
+            <label class="form-label">Fecha Inicio</label>
+            <input type="date" name="fechaInicio" class="form-control" style="width:160px;" th:value="${fechaInicio}"/>
+          </div>
+          <div>
+            <label class="form-label">Fecha Fin</label>
+            <input type="date" name="fechaFin" class="form-control" style="width:160px;" th:value="${fechaFin}"/>
+          </div>
+          <div>
+            <label class="form-label">Estudiante</label>
+            <select name="estudianteId" class="form-select" style="width:200px;">
+              <option value="">Todos</option>
+              <option th:each="est : ${estudiantes}" th:value="${est.id}" th:text="${est.getNombreCompleto()}">Est</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button type="submit" class="btn btn-primary btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Filtrar
+            </button>
+            <a th:href="@{/reportes}" class="btn btn-outline btn-sm">Limpiar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="report-stats">
+      <div class="report-stat-card blue">
+        <div class="report-stat-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Horas Totales
+        </div>
+        <div class="report-stat-value">0.0</div>
+        <div class="report-stat-sub">0 horas registradas</div>
+      </div>
+      <div class="report-stat-card green">
+        <div class="report-stat-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Estudiantes Activos
+        </div>
+        <div class="report-stat-value" th:text="${totalEstudiantes}">0</div>
+        <div class="report-stat-sub" th:text="${totalEstudiantes} + ' en total'">0 total</div>
+      </div>
+      <div class="report-stat-card violet">
+        <div class="report-stat-label">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          Áreas con Actividad
+        </div>
+        <div class="report-stat-value">0</div>
+        <div class="report-stat-sub" th:text="'de ' + ${areas.size()} + ' áreas'">de 0</div>
+      </div>
+    </div>
+
+    <!-- Tablas -->
+    <div class="two-col">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Horas por Estudiante
+          </span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Estudiante</th><th>Programa</th><th>Turnos</th><th>Horas</th></tr></thead>
+            <tbody>
+              <tr th:if="${estudiantes.isEmpty()}"><td colspan="4" class="empty-state">No hay datos</td></tr>
+              <tr th:each="est : ${estudiantes}">
+                <td>
+                  <div class="student-row">
+                    <div class="avatar-circle" style="background:linear-gradient(135deg,#14b8a6,#0f766e);width:30px;height:30px;font-size:11px;" th:text="${#strings.substring(est.nombres,0,1)}">J</div>
+                    <div>
+                      <div class="student-name" style="font-size:13px;" th:text="${est.getNombreCompleto()}">Nombre</div>
+                      <div class="student-id" th:text="${est.documento}">Doc</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-sm text-slate" th:text="${est.programa ?: '—'}">—</td>
+                <td><span class="badge badge-teal">0</span></td>
+                <td class="font-semibold">0.0 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            Horas por Área
+          </span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Área</th><th>Turnos</th><th>Horas</th></tr></thead>
+            <tbody>
+              <tr th:if="${areas.isEmpty()}"><td colspan="3" class="empty-state">Sin áreas</td></tr>
+              <tr th:each="area : ${areas}">
+                <td><span class="badge badge-violet" th:text="${area.nombre}">Área</span></td>
+                <td><span class="badge badge-slate">0</span></td>
+                <td class="font-semibold">0.0 h</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalle por área -->
+    <div class="card" style="margin-top:20px;">
+      <div class="card-header">
+        <span class="card-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Detalle por Área
+        </span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Área</th><th>Sede</th><th>Horas Totales</th><th>Estudiantes</th><th>Capacidad</th><th>Ocupación</th></tr></thead>
+          <tbody>
+            <tr th:if="${areas.isEmpty()}"><td colspan="6" class="empty-state">No hay áreas configuradas</td></tr>
+            <tr th:each="area : ${areas}">
+              <td>
+                <div class="flex gap-2 items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                  <span class="font-semibold" th:text="${area.nombre}">Área</span>
+                </div>
+              </td>
+              <td class="text-sm text-slate" th:text="${area.sede ?: '—'}">Sede</td>
+              <td class="font-semibold">0.0 h</td>
+              <td>0</td>
+              <td th:text="${area.capacidadMaxima}">0</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <div class="progress-bar" style="width:80px;flex-shrink:0;"><div class="progress-fill" style="width:0%"></div></div>
+                  <span class="text-sm text-slate">0%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+<script>
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function imprimirReporte(){
+  document.getElementById('printDate').textContent = 'Generado: ' + new Date().toLocaleDateString('es-CO', {year:'numeric',month:'long',day:'numeric'});
+  window.print();
+}
+</script>
+</body>
+</html>

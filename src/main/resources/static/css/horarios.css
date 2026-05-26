@@ -1,0 +1,465 @@
+/* ============================================================
+   Módulo de Horarios — Diseño Premium
+   ============================================================ */
+
+/* ---- Vista Switcher ---- */
+.vista-switcher {
+  display: flex;
+  background: var(--slate-100);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 2px;
+}
+.vista-btn {
+  padding: 8px 20px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--slate-500);
+  transition: all .2s;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.vista-btn.active,
+.vista-btn:hover {
+  background: #fff;
+  color: var(--teal-700);
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.vista-btn.active {
+  color: var(--teal-700);
+  font-weight: 700;
+}
+
+/* ---- Nav fechas ---- */
+.fecha-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fecha-nav-btn {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1.5px solid var(--slate-200);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--slate-600);
+  transition: all .15s;
+  text-decoration: none;
+}
+.fecha-nav-btn:hover { border-color: var(--teal-400); color: var(--teal-600); background: var(--teal-50); }
+.fecha-label {
+  font-size: 15px; font-weight: 700; color: var(--slate-800);
+  min-width: 200px; text-align: center;
+}
+
+/* ---- Calendario Semanal ---- */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.cal-header {
+  background: var(--teal-700);
+  color: #fff;
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.cal-header.time-col { background: var(--teal-800); font-size: 10px; }
+.cal-header.today { background: var(--teal-500); }
+.cal-day-name { font-size: 11px; opacity:.8; }
+.cal-day-num {
+  font-size: 22px; font-weight: 800; line-height: 1;
+  margin-top: 2px;
+}
+.cal-header.today .cal-day-num {
+  background: rgba(255,255,255,.25);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 2px auto 0;
+}
+
+.cal-time {
+  font-size: 10px;
+  color: var(--slate-400);
+  padding: 4px 6px;
+  text-align: right;
+  border-right: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+  height: 52px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.cal-cell {
+  border-right: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+  height: 52px;
+  padding: 3px;
+  position: relative;
+  transition: background .1s;
+}
+.cal-cell:hover { background: var(--teal-50); }
+.cal-cell.today-col { background: rgba(20,184,166,.03); }
+
+.turno-chip {
+  background: linear-gradient(135deg, var(--teal-500), var(--teal-700));
+  color: #fff;
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+.turno-chip:hover { transform: scale(1.02); box-shadow: 0 3px 10px rgba(13,148,136,.35); }
+.turno-chip.violet { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.turno-chip.blue   { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.turno-chip.amber  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.turno-chip.rose   { background: linear-gradient(135deg, #f43f5e, #be123c); }
+.turno-chip.emerald{ background: linear-gradient(135deg, #10b981, #059669); }
+
+/* ---- Vista Diaria ---- */
+.day-timeline {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.day-header-full {
+  grid-column: 1/-1;
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-600));
+  padding: 16px 22px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.day-hour {
+  font-size: 11px; color: var(--slate-400);
+  padding: 8px 8px;
+  text-align: right;
+  border-right: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+  min-height: 60px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.day-slot {
+  border-bottom: 1px solid var(--slate-100);
+  min-height: 60px;
+  padding: 4px 8px;
+  position: relative;
+}
+.day-slot:hover { background: var(--teal-50); }
+.turno-block {
+  background: linear-gradient(135deg, var(--teal-50), #fff);
+  border: 1.5px solid var(--teal-200);
+  border-left: 4px solid var(--teal-500);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all .2s;
+}
+.turno-block:hover { border-color: var(--teal-400); box-shadow: 0 2px 12px rgba(13,148,136,.15); }
+.turno-block.violet { border-left-color: var(--violet-500); background: linear-gradient(135deg, #ede9fe, #fff); border-color: #ddd6fe; }
+.turno-block.blue   { border-left-color: #3b82f6; background: linear-gradient(135deg, #dbeafe, #fff); border-color: #bfdbfe; }
+.turno-block.amber  { border-left-color: var(--amber-500); background: linear-gradient(135deg, #fef3c7, #fff); border-color: #fde68a; }
+.turno-block.rose   { border-left-color: #f43f5e; background: linear-gradient(135deg, #ffe4e6, #fff); border-color: #fecdd3; }
+
+/* ---- Vista Mensual ---- */
+.month-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+.month-day-header {
+  background: var(--teal-700);
+  color: #fff;
+  text-align: center;
+  padding: 10px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.month-day {
+  min-height: 90px;
+  border-right: 1px solid var(--slate-100);
+  border-bottom: 1px solid var(--slate-100);
+  padding: 6px;
+  transition: background .1s;
+}
+.month-day:hover { background: var(--teal-50); }
+.month-day.other-month { background: var(--slate-50); }
+.month-day.today-day { background: rgba(20,184,166,.05); }
+.month-day-num {
+  font-size: 12px; font-weight: 700; color: var(--slate-500);
+  margin-bottom: 4px;
+  width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+}
+.month-day.today-day .month-day-num {
+  background: var(--teal-600); color: #fff;
+}
+.month-turno-pill {
+  background: linear-gradient(90deg, var(--teal-500), var(--teal-600));
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: opacity .15s;
+  display: block;
+}
+.month-turno-pill:hover { opacity: .85; }
+.month-turno-pill.violet { background: linear-gradient(90deg, #8b5cf6, #6d28d9); }
+.month-turno-pill.blue   { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+.month-turno-pill.amber  { background: linear-gradient(90deg, #f59e0b, #d97706); }
+.month-turno-pill.rose   { background: linear-gradient(90deg, #f43f5e, #be123c); }
+.month-more { font-size: 9px; color: var(--teal-600); font-weight: 700; padding: 1px 4px; cursor: pointer; }
+
+/* ---- Formulario Nuevo Turno ---- */
+.turno-form-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid var(--slate-200);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.turno-form-header {
+  background: linear-gradient(135deg, var(--teal-700), var(--teal-600));
+  padding: 18px 24px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.turno-form-body { padding: 24px; }
+
+/* ---- Selector múltiple estudiantes ---- */
+.estudiantes-selector {
+  border: 1.5px solid var(--slate-200);
+  border-radius: 10px;
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.estudiantes-selector:focus-within {
+  border-color: var(--teal-400);
+  box-shadow: 0 0 0 3px rgba(20,184,166,.1);
+}
+.est-search {
+  padding: 9px 13px;
+  border: none;
+  border-bottom: 1px solid var(--slate-100);
+  width: 100%;
+  font-size: 13px;
+  color: var(--slate-700);
+  font-family: inherit;
+  background: var(--slate-50);
+}
+.est-search:focus { outline: none; background: #fff; }
+.est-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 13px;
+  cursor: pointer;
+  transition: background .1s;
+  border-bottom: 1px solid var(--slate-50);
+}
+.est-item:hover { background: var(--teal-50); }
+.est-item.selected { background: rgba(20,184,166,.08); }
+.est-checkbox {
+  width: 17px; height: 17px;
+  border-radius: 5px;
+  border: 2px solid var(--slate-300);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.est-item.selected .est-checkbox {
+  background: var(--teal-600);
+  border-color: var(--teal-600);
+  color: #fff;
+  font-size: 11px;
+}
+.est-name { font-size: 13px; font-weight: 600; color: var(--slate-800); }
+.est-prog { font-size: 11px; color: var(--slate-400); }
+.sel-counter {
+  background: var(--teal-600);
+  color: #fff;
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+/* ---- Detalle popup ---- */
+.detalle-popup {
+  position: fixed;
+  z-index: 500;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.2);
+  border: 1px solid var(--slate-200);
+  padding: 18px;
+  min-width: 240px;
+  max-width: 300px;
+  display: none;
+}
+.detalle-popup.show { display: block; }
+.popup-header { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: var(--slate-800); }
+.popup-row { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; font-size: 12px; color: var(--slate-600); }
+.popup-close { position: absolute; top: 10px; right: 10px; background: none; border: none; cursor: pointer; color: var(--slate-400); font-size: 16px; }
+
+/* Colores áreas */
+.color-0 { --area-color: #14b8a6; }
+.color-1 { --area-color: #8b5cf6; }
+.color-2 { --area-color: #3b82f6; }
+.color-3 { --area-color: #f59e0b; }
+.color-4 { --area-color: #f43f5e; }
+.color-5 { --area-color: #10b981; }
+
+/* ---- Ajustes responsivos y pulido final ---- */
+.calendar-grid {
+  box-shadow: var(--shadow);
+}
+
+/* Header topbar semana - sticky */
+.calendar-grid .cal-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Scrollable calendar */
+.cal-scroll-wrap {
+  max-height: 560px;
+  overflow-y: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.cal-scroll-wrap::-webkit-scrollbar { width: 5px; }
+.cal-scroll-wrap::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 99px; }
+
+/* Day timeline scrollable */
+.day-scroll-wrap {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.day-scroll-wrap::-webkit-scrollbar { width: 5px; }
+.day-scroll-wrap::-webkit-scrollbar-thumb { background: var(--slate-200); border-radius: 99px; }
+
+/* Month calendar */
+.month-cal {
+  box-shadow: var(--shadow);
+}
+
+/* Leyenda de colores de áreas */
+.area-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.area-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--slate-600);
+  background: #fff;
+  border: 1px solid var(--slate-200);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+.area-legend-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Empty day placeholder */
+.day-slot.empty-hint::after {
+  content: '';
+  display: block;
+  height: 100%;
+}
+
+/* Form modal mejorado */
+.modal[style*="680px"] .modal-header {
+  border-radius: 14px 14px 0 0;
+}
+
+/* Highlight turno al hover en tabla */
+tbody tr:hover .turno-block { border-color: var(--teal-400); }
+
+/* Badge contador selección animado */
+.sel-counter {
+  animation: popIn .2s ease;
+}
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Hora actual highlight */
+.cal-cell.now-row { background: rgba(20,184,166,.06); }
+.day-slot.now-row { background: rgba(20,184,166,.04); border-left: 2px solid var(--teal-400); }
+
+/* Línea de hora actual */
+.now-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--red-400);
+  z-index: 5;
+  border-radius: 99px;
+}
+.now-line::before {
+  content: '';
+  position: absolute;
+  left: -4px; top: -4px;
+  width: 10px; height: 10px;
+  background: var(--red-400);
+  border-radius: 50%;
+}

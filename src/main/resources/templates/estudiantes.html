@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudiantes — Hospital San Rafael</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}" />
+  <style>
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f766e;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: 14px 0 6px;
+      border-bottom: 1px solid #f1f5f9;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    @media(max-width:640px) {
+
+      .form-grid-3,
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      background: #f8fafc;
+    }
+
+    .upload-area:hover {
+      border-color: #0d9488;
+      background: #f0fdfa;
+    }
+
+    .upload-area input[type=file] {
+      display: none;
+    }
+
+    .upload-label {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    .upload-label strong {
+      color: #0f766e;
+    }
+
+    .file-preview {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: #f0fdfa;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #0f766e;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .checkbox-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: #0f766e;
+    }
+
+    .modal-xl {
+      max-width: 900px !important;
+    }
+
+    /* Avatar */
+    .avatar-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #14b8a6, #0f766e);
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Foto upload circular */
+    .foto-upload-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .foto-preview-circle {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #14b8a6, #0f766e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      border: 3px solid #99f6e4;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .foto-preview-circle:hover {
+      border-color: #0d9488;
+      transform: scale(1.04);
+    }
+
+    .foto-preview-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .foto-upload-btn {
+      font-size: 12px;
+      color: #0f766e;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    /* Checklist documentos */
+    .docs-checklist {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+    }
+
+    .docs-checklist-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #0f766e;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .doc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid #ccfbf1;
+      font-size: 13px;
+    }
+
+    .doc-item:last-child {
+      border-bottom: none;
+    }
+
+    .doc-status-ok {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #22c55e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .doc-status-miss {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .doc-label {
+      flex: 1;
+      color: #334155;
+    }
+
+    .doc-badge-ok {
+      font-size: 10px;
+      font-weight: 700;
+      background: #dcfce7;
+      color: #15803d;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .doc-badge-miss {
+      font-size: 10px;
+      font-weight: 700;
+      background: #fef2f2;
+      color: #b91c1c;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    .progress-bar-wrap {
+      margin-top: 10px;
+      background: #e2e8f0;
+      border-radius: 99px;
+      height: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0d9488, #22c55e);
+      border-radius: 99px;
+      transition: .5s;
+    }
+
+    .progress-label {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    /* Botón subir dentro del checklist */
+    .doc-upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #0f766e;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 6px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: .15s;
+      white-space: nowrap;
+      margin-left: 6px;
+    }
+
+    .doc-upload-btn:hover {
+      background: #ccfbf1;
+      border-color: #0d9488;
+    }
+
+    .doc-upload-btn.done {
+      color: #15803d;
+      background: #dcfce7;
+      border-color: #86efac;
+      pointer-events: none;
+    }
+
+    /* Filtro botones */
+    .filtro-btn {
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #cbd5e1;
+      background: none;
+      color: #64748b;
+      text-decoration: none;
+      display: inline-block;
+      transition: .15s;
+    }
+
+    .filtro-btn.activo {
+      background: #0f766e;
+      color: #fff;
+      border-color: #0f766e;
+    }
+  </style>
+</head>
+
+<body class="app-layout">
+  <div th:replace="~{fragments/sidebar :: sidebar('estudiantes')}"></div>
+  <div class="main-wrap">
+    <div th:replace="~{fragments/sidebar :: topbar}"></div>
+    <main class="page-content">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+              <path d="M6 12v5c3 3 9 3 12 0v-5" />
+            </svg>
+            Registro de Estudiantes
+          </div>
+          <div class="page-subtitle">Gestión de información académica y personal</div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="abrirRegistroRapido()" class="btn btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+            Registro Rápido
+          </button>
+          <button onclick="abrirRegistroCompleto()" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            Registro Completo
+          </button>
+        </div>
+      </div>
+
+      <div th:if="${mensaje}" class="alert"
+        th:classappend="${tipoMensaje=='success'} ? ' alert-success' : ' alert-error'" th:text="${mensaje}"></div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">
+            Estudiantes Registrados
+            <span class="badge badge-teal" style="margin-left:8px;"
+              th:text="${estudiantes.size()} + ' registros'">0</span>
+          </span>
+          <div class="flex gap-2 items-center">
+            <a th:href="@{/estudiantes(filtro='activos')}" th:classappend="${filtro != 'todos'} ? ' activo' : ''"
+              class="filtro-btn">Activos</a>
+            <a th:href="@{/estudiantes(filtro='todos')}" th:classappend="${filtro == 'todos'}  ? ' activo' : ''"
+              class="filtro-btn">Todos</a>
+            <form th:action="@{/estudiantes}" method="get" style="position:relative;">
+              <input type="hidden" name="filtro" th:value="${filtro}" />
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input type="text" name="buscar" class="form-control" placeholder="Buscar..." th:value="${buscar}"
+                style="padding-left:32px;width:200px;" />
+            </form>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Documento</th>
+                <th>Programa / Universidad</th>
+                <th>Semestre</th>
+                <th>Vinculación</th>
+                <th>Documentos</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${estudiantes.isEmpty()}">
+                <td colspan="8" class="empty-state">No hay estudiantes registrados</td>
+              </tr>
+              <tr th:each="est : ${estudiantes}">
+
+                <!-- Estudiante -->
+                <td>
+                  <div class="student-row">
+                    <div class="avatar-circle">
+                      <img th:if="${est.fotoPath != null and !#strings.isEmpty(est.fotoPath)}"
+                        th:src="@{/uploads/} + ${est.fotoPath}" th:alt="${est.getNombreCompleto()}" />
+                      <span th:unless="${est.fotoPath != null and !#strings.isEmpty(est.fotoPath)}"
+                        th:text="${#strings.substring(est.nombres,0,1)}"
+                        style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">J</span>
+                    </div>
+                    <div>
+                      <div class="student-name" th:text="${est.getNombreCompleto()}">Nombre</div>
+                      <div class="student-id" th:text="${est.correo ?: '—'}">correo</div>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- Documento -->
+                <td class="text-sm" th:text="${est.documento}">—</td>
+
+                <!-- Programa / Universidad -->
+                <td>
+                  <div class="student-name" style="font-size:13px;" th:text="${est.programa ?: '—'}">Medicina</div>
+                  <div class="student-id" th:text="${est.universidad?.nombre ?: '—'}">Universidad</div>
+                </td>
+
+                <!-- Semestre -->
+                <td class="text-sm" th:text="${est.semestre != null ? est.semestre + '° sem.' : '—'}">—</td>
+
+                <!-- Vinculación -->
+                <td>
+                  <span class="badge badge-teal"
+                    th:text="${est.tipoVinculacion ?: 'Estudiante en práctica'}">Vinc.</span>
+                </td>
+
+                <!-- Documentos — barra de progreso simple, sin campos que puedan no existir -->
+                <td>
+                  <div style="display:flex;gap:5px;align-items:center;">
+                    <!-- Ícono foto -->
+                    <span
+                      th:style="${est.fotoPath != null and !#strings.isEmpty(est.fotoPath)} ? 'color:#22c55e' : 'color:#cbd5e1'"
+                      title="Foto">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                      </svg>
+                    </span>
+                    <!-- Ícono vacunas -->
+                    <span th:style="${est.vacunasCompletas} ? 'color:#22c55e' : 'color:#cbd5e1'"
+                      title="Vacunas completas">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 2l4 4-14 14H4v-4z" />
+                        <path d="m14.5 5.5 4 4" />
+                      </svg>
+                    </span>
+                    <!-- Ícono inducción -->
+                    <span th:style="${est.induccionCompleta} ? 'color:#22c55e' : 'color:#cbd5e1'"
+                      title="Inducción completa">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </span>
+                  </div>
+                  <div style="margin-top:4px;font-size:10px;color:#94a3b8;">
+                    <span
+                      th:text="${(est.fotoPath != null and !#strings.isEmpty(est.fotoPath) ? 1 : 0) + (est.vacunasCompletas ? 1 : 0) + (est.induccionCompleta ? 1 : 0)} + '/3'">0/3</span>
+                  </div>
+                </td>
+
+                <!-- Estado -->
+                <td>
+                  <span th:if="${est.activo}" class="badge badge-green">ACTIVO</span>
+                  <span th:unless="${est.activo}" class="badge badge-slate">INACTIVO</span>
+                </td>
+
+                <!-- Acciones -->
+                <td>
+                  <div class="flex gap-2">
+                    <!-- Botón editar -->
+                    <button class="btn btn-outline btn-icon btn-sm" th:data-id="${est.id}"
+                      th:data-nombres="${est.nombres}" th:data-apellidos="${est.apellidos}"
+                      th:data-documento="${est.documento}" th:data-programa="${est.programa}"
+                      th:data-vinculacion="${est.tipoVinculacion}" th:data-universidad="${est.universidad?.id}"
+                      th:data-correo="${est.correo}" th:data-celular="${est.celular}" th:data-semestre="${est.semestre}"
+                      th:data-foto="${est.fotoPath}" th:data-vacunas="${est.vacunasCompletas}"
+                      th:data-induccion="${est.induccionCompleta}" onclick="cargarEditar(this)" title="Editar">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                      </svg>
+                    </button>
+                    <!-- Botón desactivar/reactivar -->
+                    <form th:action="@{/estudiantes/eliminar/{id}(id=${est.id})}" method="post" style="display:inline;">
+                      <button type="submit" class="btn btn-outline btn-icon btn-sm"
+                        th:style="${est.activo} ? 'color:#f59e0b' : 'color:#0f766e'"
+                        th:title="${est.activo} ? 'Desactivar' : 'Reactivar'"
+                        th:attr="onclick=${est.activo} ? 'return confirm(\'¿Desactivar este estudiante?\')' : 'return confirm(\'¿Reactivar este estudiante?\')'">
+                        <svg th:if="${est.activo}" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+                        </svg>
+                        <svg th:unless="${est.activo}" xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round">
+                          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                          <path d="M3 3v5h5" />
+                        </svg>
+                      </button>
+                    </form>
+                    <!-- Botón eliminar definitivamente -->
+                    <form th:action="@{/estudiantes/borrar/{id}(id=${est.id})}" method="post" style="display:inline;">
+                      <button type="submit" class="btn btn-outline btn-icon btn-sm" style="color:#ef4444;"
+                        title="Eliminar definitivamente"
+                        onclick="return confirm('⚠️ ¿Eliminar definitivamente? Esta acción NO se puede deshacer.')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <polyline points="3 6 5 6 21 6" />
+                          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                          <path d="M10 11v6M14 11v6" />
+                          <path d="M9 6V4h6v2" />
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="padding:14px 22px;font-size:12px;color:#94a3b8;"
+          th:text="'Mostrando ' + ${estudiantes.size()} + ' estudiantes'">Mostrando 0</div>
+      </div>
+
+      <!-- ================================================================
+           MODAL REGISTRO RÁPIDO
+           ================================================================ -->
+      <div class="modal-overlay" id="modalRapido">
+        <div class="modal" style="max-width:660px;">
+          <div class="modal-header"
+            style="background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-radius:14px 14px 0 0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
+              <div>
+                <div class="modal-title" style="color:#fff;" id="tituloRapido">Registro Rápido</div>
+                <div style="font-size:12px;opacity:.75;">Datos esenciales para iniciar práctica</div>
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('modalRapido')" style="color:rgba(255,255,255,.7);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <form th:action="@{/estudiantes/guardar}" method="post" enctype="multipart/form-data">
+            <div class="modal-body" style="padding:22px;max-height:80vh;overflow-y:auto;">
+              <input type="hidden" name="estudianteId" id="rapidoId" />
+              <input type="hidden" name="fotoPathActual" id="rFotoPathActual" />
+
+              <!-- Checklist de documentos (visible al editar) -->
+              <div class="docs-checklist" id="checklistRapido" style="display:none;">
+                <div class="docs-checklist-title">Estado de documentos</div>
+
+                <!-- Foto -->
+                <div class="doc-item">
+                  <div id="chkFotoIcon" class="doc-status-miss"><svg xmlns="http://www.w3.org/2000/svg" width="10"
+                      height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+                  <span class="doc-label">Foto tipo documento</span>
+                  <span id="chkFotoBadge" class="doc-badge-miss">Falta</span>
+                  <button type="button" id="btnSubirFoto" class="doc-upload-btn"
+                    onclick="document.getElementById('rFoto').click()" title="Subir foto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Subir
+                  </button>
+                </div>
+
+                <!-- Vacunas -->
+                <div class="doc-item">
+                  <div id="chkVacIcon" class="doc-status-miss"><svg xmlns="http://www.w3.org/2000/svg" width="10"
+                      height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+                  <span class="doc-label">Vacunas completas</span>
+                  <span id="chkVacBadge" class="doc-badge-miss">Pendiente</span>
+                  <label id="btnSubirVac" class="doc-upload-btn" title="Marcar vacunas y subir carné">
+                    <input type="file" id="chkVacFile" accept=".pdf,.doc,.docx" style="display:none;"
+                      onchange="onChecklistFileChange(this,'chkVacBadge','chkVacIcon','rVacunas','rVacFileNom','rDoc')" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    Subir carné
+                  </label>
+                </div>
+                <div id="rVacFileNom" style="display:none;font-size:11px;color:#0f766e;padding:2px 0 4px 30px;"></div>
+
+                <!-- Inducción -->
+                <div class="doc-item">
+                  <div id="chkIndIcon" class="doc-status-miss"><svg xmlns="http://www.w3.org/2000/svg" width="10"
+                      height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3"
+                      stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg></div>
+                  <span class="doc-label">Inducción completa</span>
+                  <span id="chkIndBadge" class="doc-badge-miss">Pendiente</span>
+                  <button type="button" id="btnMarcarInd" class="doc-upload-btn" onclick="marcarInduccion()"
+                    title="Marcar inducción como completa">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Marcar
+                  </button>
+                </div>
+
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar-fill" id="progressBarRapido" style="width:0%"></div>
+                </div>
+                <div class="progress-label" id="progressLabelRapido">0 de 3 ítems completados</div>
+              </div>
+
+              <!-- Foto de perfil circular -->
+              <div style="display:flex;justify-content:center;margin-bottom:18px;">
+                <div class="foto-upload-wrap">
+                  <div class="foto-preview-circle" id="rFotoCircle" onclick="document.getElementById('rFoto').click()"
+                    title="Clic para cambiar foto">
+                    <span id="rFotoInitial"
+                      style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">?</span>
+                    <img id="rFotoImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;"
+                      alt="Foto perfil" />
+                  </div>
+                  <button type="button" class="foto-upload-btn"
+                    onclick="document.getElementById('rFoto').click()">Cambiar foto de perfil</button>
+                  <input type="file" id="rFoto" name="foto" accept=".png,.jpg,.jpeg"
+                    onchange="onFotoChange(this,'rFotoImg','rFotoInitial','prevFoto','nomFoto')"
+                    style="display:none;" />
+                  <div class="file-preview" id="prevFoto"><span id="nomFoto"></span></div>
+                </div>
+              </div>
+
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Nombres *</label><input type="text" name="nombres"
+                    id="rNombres" class="form-control" required placeholder="Nombres completos"
+                    oninput="actualizarInicialRapido()" /></div>
+                <div class="form-group"><label class="form-label">Apellidos *</label><input type="text" name="apellidos"
+                    id="rApellidos" class="form-control" required placeholder="Apellidos completos" /></div>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Documento *</label><input type="text" name="documento"
+                    id="rDocumento" class="form-control" required placeholder="N° de cédula" /></div>
+                <div class="form-group">
+                  <label class="form-label">Tipo de Vinculación *</label>
+                  <select name="tipoVinculacion" id="rVinculacion" class="form-select">
+                    <option value="Estudiante en práctica">Estudiante en práctica</option>
+                    <option value="Médico Interno">Médico Interno</option>
+                    <option value="Residente del programa de especialización">Residente</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Programa Académico *</label><input type="text"
+                    name="programa" id="rPrograma" class="form-control" required
+                    placeholder="Ej: Medicina, Enfermería" /></div>
+                <div class="form-group">
+                  <label class="form-label">Universidad *</label>
+                  <select name="universidadId" id="rUniversidad" class="form-select" required>
+                    <option value="">Seleccionar universidad</option>
+                    <option th:each="u : ${universidades}" th:value="${u.id}" th:text="${u.nombre}">Univ</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Correo</label><input type="email" name="correo"
+                    id="rCorreo" class="form-control" placeholder="correo@email.com" /></div>
+                <div class="form-group"><label class="form-label">Celular</label><input type="text" name="celular"
+                    id="rCelular" class="form-control" placeholder="300 000 0000" /></div>
+              </div>
+              <div style="display:flex;gap:24px;margin:12px 0;">
+                <label class="checkbox-row"><input type="checkbox" name="vacunasCompletas" id="rVacunas" value="true" />
+                  Vacunas completas</label>
+                <label class="checkbox-row"><input type="checkbox" name="induccionCompleta" id="rInduccion"
+                    value="true" /> Inducción completa</label>
+              </div>
+
+              <div class="section-title" style="margin-top:8px;">Documento soporte</div>
+              <div class="form-group">
+                <div class="upload-area" onclick="document.getElementById('rDoc').click()">
+                  <input type="file" id="rDoc" name="documentoSoporte" accept=".pdf,.doc,.docx"
+                    onchange="mostrarArchivo(this,'prevDoc','nomDoc')" />
+                  <div class="upload-label"><strong>Clic para subir documento</strong><br />PDF, DOC, DOCX — máx 10 MB
+                  </div>
+                </div>
+                <div class="file-preview" id="prevDoc"><span id="nomDoc"></span></div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline" onclick="closeModal('modalRapido')">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                Guardar Estudiante
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ================================================================
+           MODAL REGISTRO COMPLETO — Hoja de Vida DS-F-07
+           ================================================================ -->
+      <div class="modal-overlay" id="modalCompleto">
+        <div class="modal modal-xl" style="max-width:900px;">
+          <div class="modal-header"
+            style="background:linear-gradient(135deg,#1e3a5f,#0f766e);color:#fff;border-radius:14px 14px 0 0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+              </svg>
+              <div>
+                <div class="modal-title" style="color:#fff;">Hoja de Vida — Personal en Formación</div>
+                <div style="font-size:12px;opacity:.75;">DS-F-07 · E.S.E Hospital Universitario San Rafael de Tunja
+                </div>
+              </div>
+            </div>
+            <button class="modal-close" onclick="closeModal('modalCompleto')" style="color:rgba(255,255,255,.7);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <form th:action="@{/estudiantes/guardar}" method="post" enctype="multipart/form-data">
+            <div class="modal-body" style="padding:24px;max-height:80vh;overflow-y:auto;">
+              <input type="hidden" name="estudianteId" id="completoId" />
+
+              <!-- Foto perfil -->
+              <div style="display:flex;justify-content:center;margin-bottom:20px;">
+                <div class="foto-upload-wrap">
+                  <div class="foto-preview-circle" onclick="document.getElementById('cFoto').click()"
+                    title="Clic para subir foto 3×4">
+                    <span id="cFotoInitial"
+                      style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">+</span>
+                    <img id="cFotoImg" src="" style="display:none;width:100%;height:100%;object-fit:cover;"
+                      alt="Foto perfil" />
+                  </div>
+                  <button type="button" class="foto-upload-btn" onclick="document.getElementById('cFoto').click()">Subir
+                    foto tipo documento 3×4</button>
+                  <input type="file" id="cFoto" name="foto" accept=".png,.jpg,.jpeg"
+                    onchange="onFotoChange(this,'cFotoImg','cFotoInitial','cprevFoto','cnomFoto')"
+                    style="display:none;" />
+                  <div class="file-preview" id="cprevFoto"><span id="cnomFoto"></span></div>
+                </div>
+              </div>
+
+              <div class="form-grid-2" style="margin-bottom:14px;">
+                <div class="form-group"><label class="form-label">Programa Académico *</label><input type="text"
+                    name="programa" id="cPrograma" class="form-control" required
+                    placeholder="Ej: Medicina, Enfermería" /></div>
+                <div class="form-group">
+                  <label class="form-label">Universidad *</label>
+                  <select name="universidadId" id="cUniversidad" class="form-select" required>
+                    <option value="">Seleccionar institución</option>
+                    <option th:each="u : ${universidades}" th:value="${u.id}" th:text="${u.nombre}">Univ</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:14px;">
+                <label class="form-label">Tipo de Vinculación *</label>
+                <select name="tipoVinculacion" id="cVinculacion" class="form-select">
+                  <option value="Estudiante en práctica">Estudiante en práctica</option>
+                  <option value="Médico Interno">Médico Interno</option>
+                  <option value="Residente del programa de especialización">Residente del programa de especialización
+                  </option>
+                </select>
+              </div>
+
+              <div class="section-title">Datos Personales</div>
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Nombres *</label><input type="text" name="nombres"
+                    id="cNombres" class="form-control" required placeholder="Como aparecen en el documento" /></div>
+                <div class="form-group"><label class="form-label">Apellidos *</label><input type="text" name="apellidos"
+                    id="cApellidos" class="form-control" required placeholder="Apellidos completos" /></div>
+              </div>
+              <div class="form-grid-3">
+                <div class="form-group"><label class="form-label">Documento *</label><input type="text" name="documento"
+                    id="cDocumento" class="form-control" required placeholder="N° de cédula" /></div>
+                <div class="form-group">
+                  <label class="form-label">Estado Civil</label>
+                  <select name="estadoCivil" id="cEstadoCivil" class="form-select">
+                    <option value="">Seleccionar</option>
+                    <option>Soltero(a)</option>
+                    <option>Casado(a)</option>
+                    <option>Unión libre</option>
+                    <option>Divorciado(a)</option>
+                    <option>Viudo(a)</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Fecha de Nacimiento</label><input type="date"
+                    name="fechaNacimiento" id="cFechaNac" class="form-control" /></div>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group"><label class="form-label">Lugar de Nacimiento</label><input type="text"
+                    name="lugarNacimiento" id="cLugarNac" class="form-control" placeholder="Ciudad, Departamento" />
+                </div>
+                <div class="form-group"><label class="form-label">Dirección en Tunja</label><input type="text"
+                    name="direccionTunja" id="cDireccion" class="form-control" placeholder="Dirección / Casa / Apto" />
+                </div>
+              </div>
+              <div class="form-grid-3">
+                <div class="form-group"><label class="form-label">Celular</label><input type="text" name="celular"
+                    id="cCelular" class="form-control" placeholder="300 000 0000" /></div>
+                <div class="form-group"><label class="form-label">Correo</label><input type="email" name="correo"
+                    id="cCorreo" class="form-control" placeholder="correo@email.com" /></div>
+                <div class="form-group">
+                  <label class="form-label">Grupo Sanguíneo</label>
+                  <select name="grupoSanguineo" id="cGrupo" class="form-select">
+                    <option value="">Seleccionar</option>
+                    <option>A+</option>
+                    <option>A-</option>
+                    <option>B+</option>
+                    <option>B-</option>
+                    <option>AB+</option>
+                    <option>AB-</option>
+                    <option>O+</option>
+                    <option>O-</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="section-title">Datos Académicos</div>
+              <div class="form-grid-3">
+                <div class="form-group"><label class="form-label">Semestre</label><input type="number" name="semestre"
+                    id="cSemestre" class="form-control" placeholder="1–12" min="1" max="12" /></div>
+                <div class="form-group"><label class="form-label">Promedio</label><input type="number" name="promedio"
+                    id="cPromedio" class="form-control" step="0.01" min="0" max="5" placeholder="0.00–5.00" /></div>
+                <div class="form-group"><label class="form-label">Fecha de Ingreso</label><input type="date"
+                    name="fechaIngreso" id="cFechaIngreso" class="form-control" /></div>
+              </div>
+
+              <div class="section-title">Aspectos de Salud</div>
+              <div style="display:flex;gap:24px;margin:8px 0 16px;">
+                <label class="checkbox-row"><input type="checkbox" name="vacunasCompletas" id="cVacunas" value="true" />
+                  Vacunas completas</label>
+                <label class="checkbox-row"><input type="checkbox" name="induccionCompleta" id="cInduccion"
+                    value="true" /> Inducción completa</label>
+              </div>
+
+              <div class="section-title">Documentos Adjuntos Obligatorios</div>
+              <div
+                style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:10px 14px;font-size:12px;color:#854d0e;margin-bottom:16px;">
+                ⚠ Recuerde: sin la totalidad de estos anexos no se puede ingresar a la práctica clínica.
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label class="form-label">Carné de Vacunas (PDF/Word)</label>
+                  <div class="upload-area" onclick="document.getElementById('cVacDoc').click()">
+                    <input type="file" id="cVacDoc" name="documentoVacunas" accept=".pdf,.doc,.docx"
+                      onchange="mostrarArchivo(this,'cprevVac','cnomVac')" />
+                    <div class="upload-label"><strong>Clic para subir carné</strong><br />PDF, DOC, DOCX — máx 10 MB
+                    </div>
+                  </div>
+                  <div class="file-preview" id="cprevVac"><span id="cnomVac"></span></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Certificado Cursos Virtuales — Anexo 3</label>
+                  <div class="upload-area" onclick="document.getElementById('cCert').click()">
+                    <input type="file" id="cCert" name="certificadoCursos" accept=".pdf,.doc,.docx"
+                      onchange="mostrarArchivo(this,'cprevCert','cnomCert')" />
+                    <div class="upload-label"><strong>Clic para subir certificado</strong><br />PDF, DOC, DOCX — máx 10
+                      MB</div>
+                  </div>
+                  <div class="file-preview" id="cprevCert"><span id="cnomCert"></span></div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Hoja de vida DS-F-07 firmada</label>
+                  <div class="upload-area" onclick="document.getElementById('cHdv').click()">
+                    <input type="file" id="cHdv" name="documentoSoporte" accept=".pdf,.doc,.docx"
+                      onchange="mostrarArchivo(this,'cprevHdv','cnomHdv')" />
+                    <div class="upload-label"><strong>Clic para subir hoja de vida</strong><br />PDF, DOC, DOCX — máx 10
+                      MB</div>
+                  </div>
+                  <div class="file-preview" id="cprevHdv"><span id="cnomHdv"></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline" onclick="closeModal('modalCompleto')">Cancelar</button>
+              <button type="submit" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                  <polyline points="17 21 17 13 7 13 7 21" />
+                  <polyline points="7 3 7 8 15 8" />
+                </svg>
+                Guardar Hoja de Vida
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(function (m) { m.classList.remove('open'); });
+    });
+
+    function actualizarInicialRapido() {
+      var n = document.getElementById('rNombres').value.trim();
+      if (document.getElementById('rFotoImg').style.display === 'none') {
+        document.getElementById('rFotoInitial').textContent = n.length > 0 ? n[0].toUpperCase() : '?';
+      }
+    }
+
+    function onFotoChange(input, imgId, initialId, prevId, nomId) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var img = document.getElementById(imgId);
+          img.src = e.target.result;
+          img.style.display = 'block';
+          document.getElementById(initialId).style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+        document.getElementById(nomId).textContent = input.files[0].name;
+        document.getElementById(prevId).style.display = 'flex';
+      }
+    }
+
+    function mostrarArchivo(input, prevId, nomId) {
+      if (input.files && input.files[0]) {
+        document.getElementById(nomId).textContent = input.files[0].name;
+        document.getElementById(prevId).style.display = 'flex';
+      } else {
+        document.getElementById(prevId).style.display = 'none';
+      }
+    }
+
+    var _checkSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    var _crossSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+    function setCheckItem(iconId, badgeId, btnId, ok, okLabel, failLabel) {
+      var icon = document.getElementById(iconId);
+      var badge = document.getElementById(badgeId);
+      var btn = document.getElementById(btnId);
+      icon.className = ok ? 'doc-status-ok' : 'doc-status-miss';
+      icon.innerHTML = ok ? _checkSvg : _crossSvg;
+      badge.className = ok ? 'doc-badge-ok' : 'doc-badge-miss';
+      badge.textContent = ok ? okLabel : failLabel;
+      if (btn) btn.style.display = ok ? 'none' : 'inline-flex';
+    }
+
+    function recalcProgress() {
+      var tieneFoto = document.getElementById('chkFotoBadge').className === 'doc-badge-ok';
+      var tieneVac = document.getElementById('chkVacBadge').className === 'doc-badge-ok';
+      var tieneInd = document.getElementById('chkIndBadge').className === 'doc-badge-ok';
+      var count = (tieneFoto ? 1 : 0) + (tieneVac ? 1 : 0) + (tieneInd ? 1 : 0);
+      var pct = Math.round(count / 3 * 100);
+      var color = count === 3 ? '#22c55e' : (count >= 1 ? '#f59e0b' : '#ef4444');
+      document.getElementById('progressBarRapido').style.cssText = 'height:100%;border-radius:99px;transition:.5s;width:' + pct + '%;background:' + color;
+      document.getElementById('progressLabelRapido').textContent = count + ' de 3 ítems completados';
+    }
+
+    function actualizarChecklist(tieneFoto, tieneVac, tieneInd) {
+      setCheckItem('chkFotoIcon', 'chkFotoBadge', 'btnSubirFoto', tieneFoto, 'Subida', 'Falta');
+      setCheckItem('chkVacIcon', 'chkVacBadge', 'btnSubirVac', tieneVac, 'Completas', 'Pendiente');
+      setCheckItem('chkIndIcon', 'chkIndBadge', 'btnMarcarInd', tieneInd, 'Completa', 'Pendiente');
+      recalcProgress();
+    }
+
+    /* Cuando se sube un archivo desde el checklist (vacunas) */
+    function onChecklistFileChange(input, badgeId, iconId, checkboxId, nomId) {
+      if (input.files && input.files[0]) {
+        // Copiar el archivo al input real del formulario (rDoc)
+        var dt = new DataTransfer();
+        dt.items.add(input.files[0]);
+        document.getElementById('rDoc').files = dt.files;
+        // Marcar el checkbox de vacunas
+        document.getElementById(checkboxId).checked = true;
+        // Actualizar el indicador
+        document.getElementById(nomId).textContent = '✓ ' + input.files[0].name;
+        document.getElementById(nomId).style.display = 'block';
+        // Marcar ítem como completo
+        setCheckItem(iconId, badgeId, 'btnSubirVac', true, 'Completas', 'Pendiente');
+        recalcProgress();
+      }
+    }
+
+    /* Cuando se sube la foto desde el botón del checklist */
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('rFoto').addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+          setCheckItem('chkFotoIcon', 'chkFotoBadge', 'btnSubirFoto', true, 'Subida', 'Falta');
+          recalcProgress();
+        }
+      });
+    });
+
+    /* Marcar inducción como completa */
+    function marcarInduccion() {
+      document.getElementById('rInduccion').checked = true;
+      setCheckItem('chkIndIcon', 'chkIndBadge', 'btnMarcarInd', true, 'Completa', 'Pendiente');
+      recalcProgress();
+    }
+
+    function abrirRegistroRapido() {
+      limpiarFormRapido();
+      document.getElementById('tituloRapido').textContent = 'Registro Rápido';
+      document.getElementById('checklistRapido').style.display = 'none';
+      openModal('modalRapido');
+    }
+
+    function abrirRegistroCompleto() {
+      limpiarFormCompleto();
+      openModal('modalCompleto');
+    }
+
+    function limpiarFormRapido() {
+      ['rapidoId', 'rNombres', 'rApellidos', 'rDocumento', 'rPrograma', 'rCorreo', 'rCelular', 'rFotoPathActual'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      document.getElementById('rVinculacion').value = 'Estudiante en práctica';
+      document.getElementById('rUniversidad').value = '';
+      document.getElementById('rFoto').value = '';
+      document.getElementById('rDoc').value = '';
+      document.getElementById('prevFoto').style.display = 'none';
+      document.getElementById('prevDoc').style.display = 'none';
+      document.getElementById('rFotoImg').style.display = 'none';
+      document.getElementById('rFotoImg').src = '';
+      document.getElementById('rFotoInitial').style.display = 'flex';
+      document.getElementById('rFotoInitial').textContent = '?';
+      document.getElementById('rVacunas').checked = false;
+      document.getElementById('rInduccion').checked = false;
+    }
+
+    function limpiarFormCompleto() {
+      ['completoId', 'cNombres', 'cApellidos', 'cDocumento', 'cPrograma', 'cCorreo', 'cCelular',
+        'cSemestre', 'cPromedio', 'cFechaNac', 'cFechaIngreso', 'cDireccion', 'cLugarNac'].forEach(function (id) {
+          var el = document.getElementById(id); if (el) el.value = '';
+        });
+      ['cVacDoc', 'cCert', 'cHdv', 'cFoto'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+      ['cprevFoto', 'cprevVac', 'cprevCert', 'cprevHdv'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.style.display = 'none';
+      });
+      document.getElementById('cVacunas').checked = false;
+      document.getElementById('cInduccion').checked = false;
+      document.getElementById('cFotoImg').style.display = 'none';
+      document.getElementById('cFotoImg').src = '';
+      document.getElementById('cFotoInitial').style.display = 'flex';
+      document.getElementById('cFotoInitial').textContent = '+';
+    }
+
+    function cargarEditar(btn) {
+      limpiarFormRapido();
+      document.getElementById('rapidoId').value = btn.dataset.id || '';
+      document.getElementById('rNombres').value = btn.dataset.nombres || '';
+      document.getElementById('rApellidos').value = btn.dataset.apellidos || '';
+      document.getElementById('rDocumento').value = btn.dataset.documento || '';
+      document.getElementById('rPrograma').value = btn.dataset.programa || '';
+      document.getElementById('rVinculacion').value = btn.dataset.vinculacion || 'Estudiante en práctica';
+      document.getElementById('rCorreo').value = btn.dataset.correo || '';
+      document.getElementById('rCelular').value = btn.dataset.celular || '';
+      if (btn.dataset.universidad) document.getElementById('rUniversidad').value = btn.dataset.universidad;
+
+      // Checkboxes
+      document.getElementById('rVacunas').checked = btn.dataset.vacunas === 'true';
+      document.getElementById('rInduccion').checked = btn.dataset.induccion === 'true';
+
+      // Foto
+      var fotoPath = btn.dataset.foto;
+      document.getElementById('rFotoPathActual').value = fotoPath || '';
+      var img = document.getElementById('rFotoImg');
+      var initial = document.getElementById('rFotoInitial');
+      if (fotoPath && fotoPath !== 'null' && fotoPath !== '') {
+        img.src = '/uploads/' + fotoPath;
+        img.style.display = 'block';
+        initial.style.display = 'none';
+      } else {
+        img.style.display = 'none';
+        initial.style.display = 'flex';
+        initial.textContent = (btn.dataset.nombres || '').charAt(0).toUpperCase() || '?';
+      }
+
+      // Checklist
+      var tieneFoto = !!(fotoPath && fotoPath !== 'null' && fotoPath !== '');
+      var tieneVac = btn.dataset.vacunas === 'true';
+      var tieneInd = btn.dataset.induccion === 'true';
+      document.getElementById('checklistRapido').style.display = 'block';
+      actualizarChecklist(tieneFoto, tieneVac, tieneInd);
+
+      document.getElementById('tituloRapido').textContent = 'Editar Estudiante';
+      openModal('modalRapido');
+    }
+  </script>
+</body>
+
+</html>

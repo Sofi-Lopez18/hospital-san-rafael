@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mi Asistencia — Hospital San Rafael</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <style>
+        .presence-hero {
+            background: linear-gradient(135deg, #0f766e, #1e3a5f);
+            border-radius: 16px;
+            padding: 32px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .presence-hero .name {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .presence-hero .prog {
+            font-size: 14px;
+            opacity: .75;
+            margin-bottom: 24px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            border-radius: 99px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .status-dentro {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .status-fuera {
+            background: rgba(255, 255, 255, .2);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, .4);
+        }
+
+        .btn-hero {
+            padding: 14px 36px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: .2s;
+        }
+
+        .btn-checkin {
+            background: #fff;
+            color: #0f766e;
+        }
+
+        .btn-checkin:hover {
+            background: #f0fdfa;
+        }
+
+        .btn-checkout {
+            background: rgba(239, 68, 68, .9);
+            color: #fff;
+        }
+
+        .btn-checkout:hover {
+            background: #dc2626;
+        }
+
+        .history-table th {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 10px 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .history-table td {
+            font-size: 13px;
+            color: #334155;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .pill-dentro {
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 99px;
+            padding: 2px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .pill-fuera {
+            background: #f1f5f9;
+            color: #64748b;
+            border-radius: 99px;
+            padding: 2px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .avatar-lg {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, .4);
+            overflow: hidden;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 700;
+            background: rgba(255, 255, 255, .2);
+        }
+    </style>
+</head>
+
+<body class="app-layout">
+    <div th:replace="~{fragments/sidebar :: sidebar('est-presencia')}"></div>
+    <div class="main-wrap">
+        <div th:replace="~{fragments/sidebar :: topbar}"></div>
+        <main class="page-content">
+
+            <div th:if="${mensaje}" class="alert"
+                th:classappend="${tipoMensaje=='success'}?' alert-success':' alert-error'" th:text="${mensaje}"></div>
+
+            <!-- Hero card -->
+            <div class="presence-hero">
+                <div class="avatar-lg">
+                    <img th:if="${estudiante.fotoPath != null and !#strings.isEmpty(estudiante.fotoPath)}"
+                        th:src="@{/uploads/} + ${estudiante.fotoPath}" style="width:100%;height:100%;object-fit:cover;"
+                        th:alt="${estudiante.getNombreCompleto()}" />
+                    <span th:unless="${estudiante.fotoPath != null and !#strings.isEmpty(estudiante.fotoPath)}"
+                        th:text="${#strings.substring(estudiante.nombres,0,1)}">J</span>
+                </div>
+                <div class="name" th:text="${estudiante.getNombreCompleto()}">Nombre</div>
+                <div class="prog" th:text="${estudiante.programa + ' · ' + (estudiante.universidad?.nombre ?: '')}">
+                    Programa</div>
+
+                <div th:if="${dentroAhora}" class="status-badge status-dentro">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Estás dentro del hospital
+                </div>
+                <div th:unless="${dentroAhora}" class="status-badge status-fuera">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    Aún no has registrado entrada hoy
+                </div>
+
+                <!-- Botones de acción -->
+                <div th:unless="${dentroAhora}">
+                    <form th:action="@{/estudiante/presencia/checkin}" method="post" style="display:inline;">
+                        <div style="margin-bottom:12px;">
+                            <select name="areaId"
+                                style="padding:8px 14px;border-radius:8px;border:none;font-size:13px;color:#334155;background:#fff;min-width:200px;">
+                                <option value="">Seleccionar área (opcional)</option>
+                                <option th:each="a : ${areas}" th:value="${a.id}" th:text="${a.nombre}">Área</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-hero btn-checkin">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                                <polyline points="10 17 15 12 10 7" />
+                                <line x1="15" y1="12" x2="3" y2="12" />
+                            </svg>
+                            Registrar Entrada
+                        </button>
+                    </form>
+                </div>
+                <div th:if="${dentroAhora}">
+                    <form th:action="@{/estudiante/presencia/checkout}" method="post" style="display:inline;">
+                        <button type="submit" class="btn-hero btn-checkout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                            Registrar Salida
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Historial -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Historial de Asistencia</span>
+                </div>
+                <div class="table-wrap" style="overflow-x:auto;">
+                    <table class="history-table" style="width:100%;border-collapse:collapse;">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Entrada</th>
+                                <th>Salida</th>
+                                <th>Área</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${historial.isEmpty()}">
+                                <td colspan="5" class="empty-state">No hay registros de asistencia</td>
+                            </tr>
+                            <tr th:each="a : ${historial}">
+                                <td th:text="${#temporals.format(a.fecha,'dd/MM/yyyy')}">—</td>
+                                <td th:text="${a.horaIngreso != null ? #temporals.format(a.horaIngreso,'HH:mm') : '—'}">
+                                    —</td>
+                                <td th:text="${a.horaSalida != null ? #temporals.format(a.horaSalida,'HH:mm') : '—'}">—
+                                </td>
+                                <td th:text="${a.especialidad?.nombre ?: '—'}">—</td>
+                                <td>
+                                    <span th:if="${a.estado == 'DENTRO'}" class="pill-dentro">DENTRO</span>
+                                    <span th:unless="${a.estado == 'DENTRO'}" class="pill-fuera">FUERA</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title th:text="${pageTitle != null ? pageTitle : 'Hospital San Rafael'} + ' — Hospital San Rafael'">Hospital San Rafael</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">🏥</div>
+    <div class="sidebar-brand-text">
+      <h2>Hospital</h2>
+      <span>San Rafael</span>
+    </div>
+  </div>
+
+  <div class="sidebar-nav">
+    <a th:href="@{/dashboard}" class="nav-item" th:classappend="${activePage == 'dashboard'} ? ' active'">
+      <span class="nav-icon">📊</span> Dashboard
+    </a>
+    <a th:href="@{/presencia}" class="nav-item" th:classappend="${activePage == 'presencia'} ? ' active'">
+      <span class="nav-icon">📡</span> Panel de Presencia
+    </a>
+
+    <div class="nav-label">Gestión</div>
+    <a th:href="@{/estudiantes}" class="nav-item" th:classappend="${activePage == 'estudiantes'} ? ' active'">
+      <span class="nav-icon">🎓</span> Estudiantes
+    </a>
+    <a th:href="@{/usuarios}" class="nav-item" th:classappend="${activePage == 'usuarios'} ? ' active'">
+      <span class="nav-icon">👥</span> Usuarios
+    </a>
+    <a th:href="@{/areas}" class="nav-item" th:classappend="${activePage == 'areas'} ? ' active'">
+      <span class="nav-icon">🏢</span> Áreas
+    </a>
+
+    <div class="nav-label">Planificación</div>
+    <a th:href="@{/horarios}" class="nav-item" th:classappend="${activePage == 'horarios'} ? ' active'">
+      <span class="nav-icon">⏰</span> Horarios
+    </a>
+    <a th:href="@{/cronograma}" class="nav-item" th:classappend="${activePage == 'cronograma'} ? ' active'">
+      <span class="nav-icon">📅</span> Cronograma
+    </a>
+
+    <div class="nav-label">Análisis</div>
+    <a th:href="@{/reportes}" class="nav-item" th:classappend="${activePage == 'reportes'} ? ' active'">
+      <span class="nav-icon">📈</span> Reportes
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="user-card" th:if="${usuarioActual != null}">
+      <div class="user-avatar" th:text="${#strings.substring(usuarioActual.nombre, 0, 1)}">A</div>
+      <div class="user-info">
+        <div class="name" th:text="${usuarioActual.nombre}">Admin</div>
+        <div class="role" th:text="${usuarioActual.rol}">Administrador</div>
+      </div>
+    </div>
+    <a th:href="@{/logout}" class="logout-btn">
+      <span>🚪</span> Cerrar Sesión
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main-wrap">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h1>Hospital Universitario San Rafael</h1>
+      <p>Sistema de Gestión Hospitalaria</p>
+    </div>
+    <div class="topbar-right" th:if="${usuarioActual != null}">
+      <div class="user-pill">
+        <div class="avatar" th:text="${#strings.substring(usuarioActual.nombre, 0, 1)}">A</div>
+        <div class="info">
+          <div class="name" th:text="${usuarioActual.nombre}">Administrador</div>
+          <div class="role" th:text="${usuarioActual.rol}">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-content" th:insert="~{::content}">
+  </main>
+</div>
+
+<script>
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(function(m) { m.classList.remove('open'); });
+  }
+});
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>

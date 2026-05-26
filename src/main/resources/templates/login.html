@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar Sesión — Hospital San Rafael</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
+
+<body style="display:block; overflow:auto;">
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo-img">
+        <img th:src="@{/img/logo-hospital.png}" alt="Logo Hospital San Rafael" />
+      </div>
+      <h1 class="login-title">Hospital Universitario<br />San Rafael</h1>
+      <p class="login-sub">Sistema de Gestión de Prácticas Hospitalarias<br />Tunja, Boyacá</p>
+
+      <div th:if="${param.error}" class="alert alert-error" style="margin-bottom:16px;">
+        ⚠ Usuario o contraseña incorrectos
+      </div>
+
+      <form class="login-form" th:action="@{/login-process}" method="post">
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="username" class="form-control" placeholder="Ingrese su usuario" required autofocus />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="login-btn">Iniciar Sesión →</button>
+      </form>
+      <p class="login-hint">Acceso exclusivo para personal autorizado · <strong>admin / admin123</strong></p>
+    </div>
+  </div>
+</body>
+
+</html>

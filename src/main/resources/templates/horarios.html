@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horarios — Hospital San Rafael</title>
+  <link rel="stylesheet" th:href="@{/css/main.css}" />
+  <link rel="stylesheet" th:href="@{/css/horarios.css}" />
+</head>
+
+<body class="app-layout">
+  <div th:replace="~{fragments/sidebar :: sidebar('horarios')}"></div>
+  <div class="main-wrap">
+    <div th:replace="~{fragments/sidebar :: topbar}"></div>
+    <main class="page-content">
+
+      <!-- HEADER -->
+      <div class="page-header" style="flex-wrap:wrap;gap:14px;">
+        <div>
+          <div class="page-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Gestión de Horarios
+          </div>
+          <div class="page-subtitle">Asignación de turnos · Vista <strong th:text="${vista}">semanal</strong></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div class="vista-switcher">
+            <a th:href="@{/horarios(vista='diaria',  fecha=${fechaRef})}" class="vista-btn"
+              th:classappend="${vista=='diaria'}  ? ' active'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+              </svg>
+              Diaria</a>
+            <a th:href="@{/horarios(vista='semanal', fecha=${fechaRef})}" class="vista-btn"
+              th:classappend="${vista=='semanal'} ? ' active'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="14" x2="16" y2="14" />
+              </svg>
+              Semanal</a>
+            <a th:href="@{/horarios(vista='mensual', fecha=${fechaRef})}" class="vista-btn"
+              th:classappend="${vista=='mensual'} ? ' active'">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="7" y1="15" x2="17" y2="15" />
+                <line x1="7" y1="19" x2="13" y2="19" />
+              </svg>
+              Mensual</a>
+          </div>
+          <button onclick="openModal('modalTurno')" class="btn btn-primary">+ Nuevo Turno</button>
+        </div>
+      </div>
+
+      <!-- Flash -->
+      <div th:if="${mensaje}" class="alert"
+        th:classappend="${tipoMensaje=='success'} ? ' alert-success' : ' alert-error'" th:text="${mensaje}"></div>
+
+      <!-- NAVEGACIÓN DE FECHAS -->
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+        <div class="fecha-nav">
+          <a th:if="${vista=='diaria'}"
+            th:href="@{/horarios(vista='diaria',   fecha=${#temporals.format(inicioDt.minusDays(1),   'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8249;</a>
+          <a th:if="${vista=='semanal'}"
+            th:href="@{/horarios(vista='semanal',  fecha=${#temporals.format(inicioDt.minusWeeks(1),  'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8249;</a>
+          <a th:if="${vista=='mensual'}"
+            th:href="@{/horarios(vista='mensual',  fecha=${#temporals.format(inicioDt.minusMonths(1), 'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8249;</a>
+          <div class="fecha-label">
+            <span th:if="${vista=='diaria'}"
+              th:text="${#strings.capitalize(#temporals.format(inicioDt,'EEEE').toLowerCase()) + ', ' + #temporals.format(inicioDt,'dd MMM yyyy')}">Hoy</span>
+            <span th:if="${vista=='semanal'}"
+              th:text="${#temporals.format(inicioDt,'dd MMM') + ' – ' + #temporals.format(finDt,'dd MMM yyyy')}">Semana</span>
+            <span th:if="${vista=='mensual'}"
+              th:text="${#strings.capitalize(#temporals.format(inicioDt,'MMMM').toLowerCase()) + ' ' + #temporals.format(inicioDt,'yyyy')}">Mes</span>
+          </div>
+          <a th:if="${vista=='diaria'}"
+            th:href="@{/horarios(vista='diaria',   fecha=${#temporals.format(inicioDt.plusDays(1),   'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8250;</a>
+          <a th:if="${vista=='semanal'}"
+            th:href="@{/horarios(vista='semanal',  fecha=${#temporals.format(inicioDt.plusWeeks(1),  'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8250;</a>
+          <a th:if="${vista=='mensual'}"
+            th:href="@{/horarios(vista='mensual',  fecha=${#temporals.format(inicioDt.plusMonths(1), 'yyyy-MM-dd')})}"
+            class="fecha-nav-btn">&#8250;</a>
+          <a th:href="@{/horarios(vista=${vista})}" class="btn btn-outline btn-sm" style="margin-left:6px;">Hoy</a>
+        </div>
+        <div style="font-size:12px;color:var(--slate-400);" th:text="${detalles.size()} + ' turno(s) en este período'">0
+        </div>
+      </div>
+
+      <!-- Leyenda de áreas -->
+      <div class="area-legend" th:if="${not #lists.isEmpty(areas)}">
+        <span style="font-size:12px;font-weight:600;color:var(--slate-500);align-self:center;">Áreas:</span>
+        <div th:each="area,idx : ${areas}" class="area-legend-item">
+          <div class="area-legend-dot" th:class="'area-dot-'+(${area.id} % 10)"></div>
+          <span th:text="${area.nombre}">Área</span>
+        </div>
+      </div>
+
+      <!-- VISTA DIARIA -->
+      <th:block th:if="${vista=='diaria'}">
+        <div th:if="${#lists.isEmpty(detalles)}" class="card" style="margin-bottom:20px;">
+          <div class="empty-state" style="padding:48px 24px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+              style="color:var(--slate-300);margin-bottom:12px;">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+            </svg>
+            <div style="font-size:15px;font-weight:600;color:var(--slate-500);margin-bottom:6px;">No hay turnos
+              programados para este día</div>
+            <div style="font-size:13px;color:var(--slate-400);">Usa el botón <strong>+ Nuevo Turno</strong> para asignar
+              uno.</div>
+          </div>
+        </div>
+        <div class="day-scroll-wrap">
+          <div class="day-timeline">
+            <div class="day-header-full">
+              <div>
+                <div style="font-size:13px;opacity:.8;font-weight:500;"
+                  th:text="${#strings.capitalize(#temporals.format(inicioDt,'EEEE').toLowerCase())}">Lunes</div>
+                <div style="font-size:26px;font-weight:800;line-height:1;"
+                  th:text="${#temporals.format(inicioDt,'dd')}">01</div>
+                <div style="font-size:12px;opacity:.7;"
+                  th:text="${#strings.capitalize(#temporals.format(inicioDt,'MMMM').toLowerCase())} + ' ' + ${#temporals.format(inicioDt,'yyyy')}">
+                  Mes</div>
+              </div>
+              <div>
+                <span th:if="${not #lists.isEmpty(detalles)}"
+                  style="background:rgba(255,255,255,.2);border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;"
+                  th:text="${detalles.size()} + ' turno(s)'">0</span>
+                <span th:if="${#lists.isEmpty(detalles)}" style="font-size:13px;opacity:.6;">Sin turnos
+                  programados</span>
+              </div>
+            </div>
+            <th:block th:each="hora : ${horasDia}">
+              <div class="day-hour" th:text="${hora &lt; 10 ? '0'+hora : ''+hora} + ':00'">06:00</div>
+              <div class="day-slot" th:id="'slot-'+${hora}">
+                <th:block th:each="det,idx : ${detalles}">
+                  <th:block th:if="${det.horaInicio.hour == hora}">
+                    <div class="turno-block" th:classappend="${'area-color-'+(det.especialidad.id % 10)}"
+                      style="display:flex;align-items:center;gap:10px;">
+                      <div class="avatar-circle"
+                        style="width:30px;height:30px;font-size:11px;background:linear-gradient(135deg,#14b8a6,#0f766e);flex-shrink:0;"
+                        th:text="${#strings.substring(det.programacion.estudiante.nombres,0,1)}">J</div>
+                      <div style="flex:1;min-width:0;">
+                        <div
+                          style="font-size:13px;font-weight:700;color:var(--slate-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
+                          th:text="${det.especialidad.nombre}">Nombre</div>
+                        <div style="font-size:11px;color:var(--slate-500);"
+                          th:text="${det.especialidad.nombre} + ' · ' + ${det.horaInicio} + ' – ' + ${det.horaFin}">Área
+                        </div>
+                      </div>
+                      <form th:action="@{/horarios/eliminar/{id}(id=${det.id})}" method="post" style="display:inline;"
+                        onsubmit="return confirm('¿Eliminar este turno?')">
+                        <input type="hidden" name="vista" th:value="${vista}" />
+                        <input type="hidden" name="fecha" th:value="${fechaRef}" />
+                        <button type="submit" class="btn btn-outline btn-icon btn-sm" style="color:var(--red-500);">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6" />
+                            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            <path d="M10 11v6M14 11v6" />
+                          </svg>
+                        </button>
+                      </form>
+                    </div>
+                  </th:block>
+                </th:block>
+              </div>
+            </th:block>
+          </div>
+        </div>
+      </th:block>
+
+      <!-- VISTA SEMANAL -->
+      <th:block th:if="${vista=='semanal'}">
+        <div class="cal-scroll-wrap">
+          <div class="calendar-grid">
+            <div class="cal-header time-col">Hora</div>
+            <th:block th:each="dia : ${diasSemana}">
+              <div class="cal-header" th:classappend="${dia.equals(hoy)} ? ' today'">
+                <div class="cal-day-name" th:text="${#strings.capitalize(#temporals.format(dia,'EEE').toLowerCase())}">
+                  Lun</div>
+                <div class="cal-day-num" th:text="${#temporals.format(dia,'dd')}">01</div>
+              </div>
+            </th:block>
+            <th:block th:each="hora : ${horasSemana}">
+              <div class="cal-time" th:text="${hora &lt; 10 ? '0'+hora : ''+hora} + ':00'">07:00</div>
+              <th:block th:each="dia : ${diasSemana}">
+                <div class="cal-cell" th:classappend="${dia.equals(hoy)} ? ' today-col'">
+                  <th:block th:each="det,idx : ${detalles}">
+                    <th:block th:if="${det.fecha.equals(dia) and det.horaInicio.hour==hora}">
+                      <div class="turno-chip" th:classappend="${'area-chip-'+(det.especialidad.id % 10)}"
+                        th:text="${det.especialidad.nombre}+' · '+${det.horaInicio}"
+                        th:title="${det.programacion.estudiante.getNombreCompleto()+' | '+det.especialidad.nombre+' | '+det.horaInicio+'-'+det.horaFin}">
+                        Turno
+                      </div>
+                    </th:block>
+                  </th:block>
+                </div>
+              </th:block>
+            </th:block>
+          </div>
+        </div>
+      </th:block>
+
+      <!-- VISTA MENSUAL -->
+      <th:block th:if="${vista=='mensual'}">
+        <div class="month-cal">
+          <div class="month-day-header">Lun</div>
+          <div class="month-day-header">Mar</div>
+          <div class="month-day-header">Mié</div>
+          <div class="month-day-header">Jue</div>
+          <div class="month-day-header">Vie</div>
+          <div class="month-day-header">Sáb</div>
+          <div class="month-day-header">Dom</div>
+          <th:block th:each="dia : ${diasMes}">
+            <div class="month-day"
+              th:classappend="${!dia.getMonth().equals(mesDt.getMonth())} ? ' other-month' : (${dia.equals(hoy)} ? ' today-day' : '')">
+              <div class="month-day-num" th:text="${#temporals.format(dia,'d')}">1</div>
+              <th:block th:each="det,idx : ${detalles}">
+                <th:block th:if="${det.fecha.equals(dia)}">
+                  <span class="month-turno-pill" th:classappend="${'area-pill-'+(det.especialidad.id % 10)}"
+                    th:text="${det.especialidad.nombre}+' '+${det.horaInicio}"
+                    th:title="${det.programacion.estudiante.getNombreCompleto()+' | '+det.especialidad.nombre+' | '+det.horaInicio+'-'+det.horaFin}">
+                    Turno
+                  </span>
+                </th:block>
+              </th:block>
+            </div>
+          </th:block>
+        </div>
+      </th:block>
+
+      <!-- TABLA RESUMEN -->
+      <div class="card" style="margin-top:24px;">
+        <div class="card-header">
+          <span class="card-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            Detalle de Turnos
+          </span>
+          <span class="badge badge-teal" th:text="${detalles.size()} + ' turnos'">0</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Área</th>
+                <th>Fecha</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Duración</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(detalles)}">
+                <td colspan="7" class="empty-state">No hay turnos en este período</td>
+              </tr>
+              <tr th:each="det : ${detalles}">
+                <td>
+                  <div class="student-row">
+                    <div class="avatar-circle"
+                      style="background:linear-gradient(135deg,#14b8a6,#0f766e);width:32px;height:32px;font-size:12px;"
+                      th:text="${#strings.substring(det.programacion.estudiante.nombres,0,1)}">J</div>
+                    <div>
+                      <div class="student-name" th:text="${det.programacion.estudiante.getNombreCompleto()}">Nombre
+                      </div>
+                      <div class="student-id" th:text="${det.programacion.estudiante.documento}">Doc</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="badge badge-teal" th:text="${det.especialidad.nombre}">Área</span></td>
+                <td class="text-sm" th:text="${#temporals.format(det.fecha,'EEE dd/MM/yyyy')}">Fecha</td>
+                <td class="text-sm font-semibold" th:text="${det.horaInicio}">08:00</td>
+                <td class="text-sm font-semibold" th:text="${det.horaFin}">14:00</td>
+                <td class="text-sm text-slate" th:text="${det.horaFin.hour - det.horaInicio.hour} + 'h'">6h</td>
+                <td>
+                  <form th:action="@{/horarios/eliminar/{id}(id=${det.id})}" method="post" style="display:inline;"
+                    onsubmit="return confirm('¿Eliminar este turno?')">
+                    <input type="hidden" name="vista" th:value="${vista}" />
+                    <input type="hidden" name="fecha" th:value="${fechaRef}" />
+                    <button type="submit" class="btn btn-outline btn-icon btn-sm" style="color:var(--red-500);">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                      </svg>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL NUEVO TURNO -->
+  <div class="modal-overlay" id="modalTurno">
+    <div class="modal" style="max-width:680px;">
+      <div class="modal-header"
+        style="background:linear-gradient(135deg,#0f766e,#0d9488);color:#fff;border-radius:14px 14px 0 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <div>
+            <div class="modal-title" style="color:#fff;">Asignar Nuevo Turno</div>
+            <div style="font-size:12px;opacity:.75;">Selecciona estudiantes, área y horario</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal('modalTurno')" style="color:rgba(255,255,255,.7);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+
+      <form th:action="@{/horarios/guardar}" method="post" id="formTurno">
+        <div class="modal-body" style="padding:24px;">
+
+          <!-- Selector múltiple estudiantes -->
+          <div class="form-group">
+            <label class="form-label">
+              Estudiantes *
+              <span class="sel-counter" id="selCounter" style="display:none;">0 sel.</span>
+            </label>
+            <div class="estudiantes-selector">
+              <input type="text" class="est-search" placeholder="Buscar estudiante..."
+                oninput="filtrarEstudiantes(this.value)" />
+              <div id="estList">
+                <div th:each="est : ${estudiantes}" class="est-item"
+                  th:data-nombre="${est.getNombreCompleto().toLowerCase()}" th:data-id="${est.id}"
+                  onclick="toggleEstudiante(this)">
+                  <div class="est-checkbox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </div>
+                  <div class="avatar-circle"
+                    style="width:28px;height:28px;font-size:10px;background:linear-gradient(135deg,#14b8a6,#0f766e);"
+                    th:text="${#strings.substring(est.nombres,0,1)}">J</div>
+                  <div>
+                    <div class="est-name" th:text="${est.getNombreCompleto()}">Nombre</div>
+                    <div class="est-prog" th:text="${est.programa ?: '—'} + ' · ' + ${est.universidad?.nombre ?: '—'}">
+                      Prog</div>
+                  </div>
+                  <input type="checkbox" name="estudiantesIds" th:value="${est.id}" class="est-real-cb"
+                    style="display:none;" />
+                </div>
+                <div th:if="${#lists.isEmpty(estudiantes)}" class="empty-state">
+                  No hay estudiantes activos
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:6px;font-size:11px;color:var(--slate-400);">
+              Haz clic para seleccionar uno o más estudiantes
+            </div>
+          </div>
+
+          <!-- Área y Tutor -->
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Área / Especialidad *</label>
+              <select name="areaId" class="form-select" required onchange="actualizarResumen()">
+                <option value="">Seleccionar área</option>
+                <option th:each="a : ${areas}" th:value="${a.id}"
+                  th:text="${a.nombre} + ' (cap. ' + ${a.capacidadMaxima} + ')'">Área</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Doctor / Tutor</label>
+              <select name="tutorId" class="form-select">
+                <option value="">Sin asignar</option>
+                <option th:each="t : ${tutores}" th:value="${t.id}" th:text="${t.nombre} + ' (' + ${t.rol} + ')'">Tutor
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Fechas -->
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Fecha Inicio *</label>
+              <input type="date" name="fechaInicio" id="inputFechaInicio" class="form-control" required
+                th:value="${fechaRef}" onchange="actualizarResumen()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha Fin
+                <span style="font-size:11px;color:var(--slate-400);font-weight:400;">(opcional)</span>
+              </label>
+              <input type="date" name="fechaFin" id="inputFechaFin" class="form-control" th:value="${fechaRef}"
+                onchange="actualizarResumen()" />
+            </div>
+          </div>
+
+          <!-- Horas -->
+          <div class="form-grid form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Hora Inicio *</label>
+              <input type="time" name="horaInicio" id="inputHoraInicio" class="form-control" value="07:00" required
+                onchange="actualizarResumen()" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora Fin *</label>
+              <input type="time" name="horaFin" id="inputHoraFin" class="form-control" value="13:00" required
+                onchange="actualizarResumen()" />
+            </div>
+          </div>
+
+          <!-- Turnos rápidos -->
+          <div class="form-group">
+            <label class="form-label">Turnos Rápidos</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="setTurno('07:00','13:00')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Mañana 7–13h</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="setTurno('13:00','19:00')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Tarde 13–19h</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="setTurno('19:00','01:00')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Noche 19–1h</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="setTurno('07:00','19:00')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                12h 7–19h</button>
+            </div>
+          </div>
+
+          <!-- Resumen -->
+          <div id="resumenTurno"
+            style="display:none;background:var(--teal-50);border:1px solid var(--teal-100);border-radius:10px;padding:14px;margin-top:4px;">
+            <div
+              style="font-size:12px;font-weight:700;color:var(--teal-700);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Resumen del turno
+            </div>
+            <div id="resumenTexto" style="font-size:12px;color:var(--slate-600);line-height:1.8;"></div>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modalTurno')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" onclick="return validarFormulario()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+              <polyline points="17 21 17 13 7 13 7 21" />
+              <polyline points="7 3 7 8 15 8" />
+            </svg>
+            Guardar Turno(s)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape')
+        document.querySelectorAll('.modal-overlay.open').forEach(function (m) { m.classList.remove('open'); });
+    });
+
+    var selectedIds = new Set();
+
+    function toggleEstudiante(item) {
+      var id = item.dataset.id;
+      var cb = item.querySelector('.est-real-cb');
+      if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+        item.classList.remove('selected');
+        cb.checked = false;
+      } else {
+        selectedIds.add(id);
+        item.classList.add('selected');
+        cb.checked = true;
+      }
+      actualizarCounter();
+      actualizarResumen();
+    }
+
+    function actualizarCounter() {
+      var c = document.getElementById('selCounter');
+      if (selectedIds.size > 0) {
+        c.style.display = 'inline';
+        c.textContent = selectedIds.size + ' sel.';
+      } else {
+        c.style.display = 'none';
+      }
+    }
+
+    function filtrarEstudiantes(q) {
+      document.querySelectorAll('#estList .est-item').forEach(function (item) {
+        var nombre = item.dataset.nombre || '';
+        item.style.display = (!q || nombre.includes(q.toLowerCase())) ? 'flex' : 'none';
+      });
+    }
+
+    function setTurno(inicio, fin) {
+      document.getElementById('inputHoraInicio').value = inicio;
+      document.getElementById('inputHoraFin').value = fin;
+      actualizarResumen();
+    }
+
+    function actualizarResumen() {
+      var fi = document.getElementById('inputFechaInicio').value;
+      var ff = document.getElementById('inputFechaFin').value;
+      var hi = document.getElementById('inputHoraInicio').value;
+      var hf = document.getElementById('inputHoraFin').value;
+      var areaEl = document.querySelector('select[name="areaId"]');
+      var areaNombre = (areaEl && areaEl.selectedIndex > 0) ? areaEl.options[areaEl.selectedIndex].text : '—';
+      var resumen = document.getElementById('resumenTurno');
+      var texto = document.getElementById('resumenTexto');
+      if (selectedIds.size > 0 && fi) {
+        resumen.style.display = 'block';
+        var dias = 1;
+        if (ff && ff >= fi) {
+          var d1 = new Date(fi + 'T00:00:00');
+          var d2 = new Date(ff + 'T00:00:00');
+          dias = Math.round((d2 - d1) / 86400000) + 1;
+        }
+        var total = selectedIds.size * dias;
+        texto.innerHTML =
+          'Estudiantes: <strong>' + selectedIds.size + '</strong><br>' +
+          'Area: <strong>' + areaNombre + '</strong><br>' +
+          'Del <strong>' + fi + '</strong> al <strong>' + (ff || fi) + '</strong> (' + dias + ' dia(s))<br>' +
+          'Horario: <strong>' + hi + ' - ' + hf + '</strong><br>' +
+          'Se crearan <strong>' + total + '</strong> turno(s)';
+      } else {
+        resumen.style.display = 'none';
+      }
+    }
+
+    function validarFormulario() {
+      if (selectedIds.size === 0) {
+        alert('Debes seleccionar al menos un estudiante.');
+        return false;
+      }
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var ahora = new Date();
+      var horaActual = ahora.getHours();
+      var minutos = ahora.getMinutes();
+      var slot = document.getElementById('slot-' + horaActual);
+      if (slot) {
+        slot.classList.add('now-row');
+        var line = document.createElement('div');
+        line.className = 'now-line';
+        line.style.top = ((minutos / 60) * 100) + '%';
+        line.style.position = 'absolute';
+        slot.style.position = 'relative';
+        slot.appendChild(line);
+      }
+    });
+  </script>
+</body>
+
+</html>
