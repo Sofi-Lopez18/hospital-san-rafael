@@ -1,4 +1,4 @@
-# Hospital San Rafael
+# Proyecto de Gestión de pasantes Hospital San Rafael 
 
 ## Descripción del proyecto
 
