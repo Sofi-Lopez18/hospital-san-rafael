@@ -93,6 +93,6 @@ Es una aplicación web desarrollada con Spring Boot 3.2.5, Java 21, PostgreSQL y
 
 Laura Sofia López Mora
 Laura Valentina Arévalo Sierra
-Sofia Andrea Castillo 
+Sofia Andrea Castillo Bautista
 
 ---
